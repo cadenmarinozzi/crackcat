@@ -7,8 +7,6 @@ First install go from https://go.dev/doc/install. Specific installation instruct
 
 To build crackcat from the source files, download the source files by clicking the green "Code" button and then "Download ZIP" or clone it using git by running the command: `git clone https://github.com/hashcat/hashcat.git` in the building directory. Then, build it by running a command line from the build directory (The same directory the source files are located in) and then running the following command: `go build crackcat.go`. After the build process is done, an executable named "crackcat.exe" will be created in the build directory. Run it directly from the exe or add it to the systems %PATH% and run it from a command line.
 
-If you are downloading the source code from a third party or just want to make sure the source code matches the current version, run "hash_gen.py" using the command `python hash_gen.py` in the build directory with python installed and check if the output hash matches the most recent hash in "HASHES".
-
 # Features
 * Multi threading and automatic thread detection
 * Dictionary attacks
