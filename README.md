@@ -18,6 +18,8 @@ To build crackcat from the source files, download the source files by clicking t
 * Username password pairs
 * Benchmarking
 * Hash auto detecting
+* Open source
+* 
 
 # Usage
 Run crackcat either from the executable directly or from the system %PATH%.. If running from the system %PATH%, use any command line and run the command "crackcat".
