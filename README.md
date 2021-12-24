@@ -22,7 +22,7 @@ To build crackcat from the source files, download the source files by clicking t
 # Usage
 Run crackcat either from the executable directly or from the system %PATH%.. If running from the system %PATH%, use any command line and run the command "crackcat".
 
-Add arguments by putting a "-" or "--" infront of the argument name and then a space connected to the argument value. For example: `crackcat -crack_mode font-back` or `crackcat --benchmark`
+Add arguments by putting a "-" or "--" infront of the argument name and then a space connected to the argument value. For example: `crackcat -crack_mode front-back` or `crackcat --benchmark`
   
 # Todo
 * GPU assisted attacks
