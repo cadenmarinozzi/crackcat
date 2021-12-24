@@ -26,6 +26,7 @@ Add arguments by putting a "-" or "--" infront of the argument name and then a s
   
 # Todo
 * GPU assisted attacks
+* Plaintext rules
 
 # Crediting
 To redistribute this code, credit the author in any of the main source files or in the program itself.

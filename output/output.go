@@ -31,8 +31,6 @@ func Save(fileName string, directory string, found []string) {
 	if (err != nil) {
 		if pathError, ok := err.(*errs.PathError); ok {
 			fmt.Println(pathError);
-
-			return;
 		}
 
 		return;

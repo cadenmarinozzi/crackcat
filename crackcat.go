@@ -101,8 +101,6 @@ func main() {
 	if (err != nil) {
 		if pathError, ok := err.(*errs.PathError); ok {
 			fmt.Println(pathError);
-
-			return;
 		}
 
 		return;
@@ -122,8 +120,6 @@ func main() {
 	if (err != nil) {
 		if pathError, ok := err.(*errs.PathError); ok {
 			fmt.Println(pathError);
-
-			return;
 		}
 
 		return;
@@ -143,8 +139,6 @@ func main() {
 	if (err != nil) {
 		if pathError, ok := err.(*errs.PathError); ok {
 			fmt.Println(pathError);
-
-			return;
 		}
 
 		return;

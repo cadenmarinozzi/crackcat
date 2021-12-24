@@ -21,9 +21,7 @@ func DictionaryFrontBack(dictionary []string, passwords []string, startTime int,
             for k := j * K; j < j * K + K; k++ {
                 p = k;
 
-                if (time.Seconds() - 1 - startTime / 1000 >= maxTime || k > nDict) {
-                    break;
-                }
+                if (time.Seconds() - 1 - startTime / 1000 >= maxTime || k > nDict) { break }
 
                 password := dictionary[k];
                 hash := hashing.Hash(password, hashingAlgorithm);

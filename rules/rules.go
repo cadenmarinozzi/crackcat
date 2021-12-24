@@ -21,9 +21,7 @@ func GenDictionary(dictionary []string, rulesList []string) (outputDictionary []
 	for _, password := range dictionary {
 		for _, rules := range rulesList {
 			if (rules == "") { continue }
-			if (len(rules) > 1) {
-				if (string(rules[:2]) == "##") { continue }
-			}
+			if (len(rules) > 1 && string(rules[:2]) == "##") { continue }
 
 			position := 0;
 			newPassword := password;
