@@ -1,0 +1,13 @@
+## comment. Gets ignored by rule generator
+
+## standard rules etc
+l
+u
+C
+C
+r
+
+## memory rules
+lMuX084
+uMuX084
+rMuX032

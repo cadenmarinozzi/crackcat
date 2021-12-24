@@ -6,6 +6,7 @@ import (
 	"main/hashing"
     "main/optimization"
 	"main/benchmarking"
+	genRules "main/rules"
 	"main/output"
 	"main/errs"
 	"main/units"
@@ -34,7 +35,9 @@ func main() {
 
 	// The arguments that can be passed to the crackcat command
 	sessionName := flag.String("session_name", "crackcat", "");
-	passwordsFile := flag.String("password_list", "example/password_list.txt", "");
+	rulesFile := flag.String("rules_file", "example/rules.txt", "");
+	dictionaryOutputFile := flag.String("dictionary_output_file", "dictionary.txt", "")
+	passwordsFile := flag.String("passwords_file", "example/password_list.txt", "");
 	dictionaryFile := flag.String("dictionary_file", "example/dictionary.txt", "");
 	outputFile := flag.String("output_file", "found.json", "");
 	crackType := flag.String("crack_type", "dictionary", "");
@@ -93,7 +96,7 @@ func main() {
 
 	// Get and parse all of the required files
 
-	body, err := ioutil.ReadFile(*passwordsFile);
+	body, err := ioutil.ReadFile(*rulesFile);
 
 	if (err != nil) {
 		if pathError, ok := err.(*errs.PathError); ok {
@@ -107,6 +110,27 @@ func main() {
 	
 	bodyString := string(body);
 	splitter := "\n";
+
+	if (strings.Contains(bodyString, "\r\n")) {
+		splitter = "\r\n";
+	}
+
+	rules := strings.Split(bodyString, splitter);
+
+	body, err = ioutil.ReadFile(*passwordsFile);
+
+	if (err != nil) {
+		if pathError, ok := err.(*errs.PathError); ok {
+			fmt.Println(pathError);
+
+			return;
+		}
+
+		return;
+	}
+	
+	bodyString = string(body);
+	splitter = "\n";
 
 	if (strings.Contains(bodyString, "\r\n")) {
 		splitter = "\r\n";
@@ -135,11 +159,19 @@ func main() {
 
 	dictionary := strings.Split(bodyString, splitter);
 
-    if (*optimizeDictionary) {
+	if (*crackType == "rules") {
+		dictionary = genRules.GenDictionary(dictionary, rules);
+	}
+
+	if (*optimizeDictionary) {
         if (*crackMode =="front-back") {
             dictionary = optimization.OptimizeFrontBack(dictionary);
         }
     }
+
+	if (*crackType == "rules" || *optimizeDictionary) {
+		output.Save(*dictionaryOutputFile, *sessionName, dictionary); // Save the output file
+	}
 
 	/**
 	* If no hashing algorithm is specified or the hashing algorithm is set to auto detect:
@@ -225,6 +257,12 @@ func main() {
 
 	switch (*crackType) {
 		case ("dictionary"):
+			switch (*crackMode) {
+				case ("front-back"):
+					found, iterations, endTime = cracking.DictionaryFrontBack(dictionary, passwords, startTime, *maxTime, *logFound, *removeFound, *hashingAlgorithm, *usernameSplitter, *nThreads);
+			}
+
+		case ("rules"):
 			switch (*crackMode) {
 				case ("front-back"):
 					found, iterations, endTime = cracking.DictionaryFrontBack(dictionary, passwords, startTime, *maxTime, *logFound, *removeFound, *hashingAlgorithm, *usernameSplitter, *nThreads);

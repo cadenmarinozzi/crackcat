@@ -10,6 +10,7 @@ To build crackcat from the source files, download the source files by clicking t
 # Features
 * Multi threading and automatic thread detection
 * Dictionary attacks
+* Rule based attacks
 * Multiple attack modes
 * Dictionary optimization
 * Time limiting
@@ -24,7 +25,6 @@ Run crackcat either from the executable directly or from the system %PATH%.. If 
 Add arguments by putting a "-" or "--" infront of the argument name and then a space connected to the argument value. For example: `crackcat -crack_mode font-back` or `crackcat --benchmark`
   
 # Todo
-* Rule based attacks and character brute force attacks
 * GPU assisted attacks
 
 # Crediting
