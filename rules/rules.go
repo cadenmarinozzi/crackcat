@@ -7,6 +7,9 @@ import (
 	"strconv"
 )
 
+/*
+* Reverses a string by appending the characters to a string, backwards
+**/
 func reverse(str string) (result string) {
     for _, character := range str {
         result = string(character) + result;

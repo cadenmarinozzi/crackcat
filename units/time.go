@@ -22,7 +22,7 @@ func ShortHandTime(time int) string {
 	unit := "ms";
 
 	if (time >= 1000) {
-		unit = "seconds";
+		unit = "s";
 		time /= 1000;
 	}
 

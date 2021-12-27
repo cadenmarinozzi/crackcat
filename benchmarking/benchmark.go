@@ -5,22 +5,23 @@ import (
 	"main/time"
 )
 
-/*
-* Benchmark starts n threads that create hashes until the maxTime has been reached. nHashed is the amount of hashes that got hashed in those n seconds
-*/
+
 func Benchmark(maxTime int, hashingAlgorithm string, nThreads int, startTime int) (int, int) {
 	nHashed := 0;
 
+	/*
+	* Start nThreads goroutines and split up the workload for the CPU
+	**/
 	for i := 0; i < nThreads; i++ {
 		go func() {
-			for (time.Seconds()  - startTime / 1000 <= maxTime) {
-				hashing.Hash("password123", hashingAlgorithm);
+			for (time.Seconds() - startTime / 1000 <= maxTime) {
+				hashing.Hash("password123", hashingAlgorithm); // Perform a hash for delay
 				nHashed++;
 			}
-		}()
+		}();
 	}
 
-	for (time.Seconds() - startTime / 1000 <= maxTime) {} // This is here so that the function doesn't return until the maxTime is reached
+	for (time.Seconds() - startTime / 1000 <= maxTime) {} // Since goroutines aren't executed on this thread, it won't delay the return
 
 	return nHashed, time.Milliseconds();
 }

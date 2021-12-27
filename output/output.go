@@ -12,9 +12,11 @@ import (
 
 /*
 * Format and save found to the file in the specified directory
-*/
+**/
 func Save(fileName string, directory string, found []string) {
-	// If the directory doesn't exist, make it
+	/* 
+	* If the directory doesn't exist, make it
+	**/
     if _, err := os.Stat(directory); (errors.Is(err, os.ErrNotExist)) {
         os.Mkdir(directory, 0755);
     }
@@ -23,7 +25,7 @@ func Save(fileName string, directory string, found []string) {
 	extension := "";
 
 	if (len(fileDetails) > 1) {
-		extension = fileDetails[1];
+		extension = "." + fileDetails[1];
 	}
 
     file, err := os.Create(directory + "/" + fileDetails[0] + "_" + time.Now().Format("01-02-2006 03_04_05") + extension); // Create the output file
