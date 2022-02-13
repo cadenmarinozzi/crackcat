@@ -34,7 +34,7 @@ func handleFound(found string, index int, state CrackState) CrackState {
 		fmt.Printf("%s:%s\n", state.Passwords[index], found);
 	}
 
-	if (state.RemoveFound && len(state.Passwords) >= index) {
+	if (state.RemoveFound && len(state.Passwords) > index) {
 		state.Passwords[index] = state.Passwords[len(state.Passwords) - 1];
 		state.Passwords = state.Passwords[:len(state.Passwords) - 1];
 	}
