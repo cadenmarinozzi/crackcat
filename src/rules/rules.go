@@ -20,7 +20,7 @@ func reverseString(input string) (reversed string) {
 }
 
 func replaceCharacterAtX(input string, replacement string, x int) string {
-	inputLength := len(input);
+	inputLength := len(input) - 1;
 
 	if (inputLength > x) {
 		return input[:x] + replacement + input[x + 1:];
@@ -48,7 +48,7 @@ func toggleCase(input string) string {
 }
 
 func toggleCaseAtX(input string, x int) string {
-	if (len(input) >= x) {
+	if (len(input) - 1 >= x) {
 		tempInput := []rune(input);
 		character := tempInput[x];
 
@@ -80,6 +80,8 @@ func GenerateRules(dictionary []string, rulesList []string) (newDictionary []str
 			for (position < len(rules)) {
 				rule := string(rules[position]);
 				newEntryLength := len(newEntry);
+
+				if (newEntry == "" || newEntryLength == 0) { continue }
 
 				switch (rule) {
 					case ":", "":

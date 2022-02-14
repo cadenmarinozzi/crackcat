@@ -21,7 +21,7 @@ You can run crackcat directly from the build directory by running `./crackcat.ex
 ## Features
 * Distributed multi threaded cracking
 * Attack methods (Dictionary)
-* Attack modes (left-right, right-left, middle-out, out-middle, bubble)
+* Attack modes (left-right, right-left)
 * Dictionary/rules optimization
 * Time limiting
 * Hashing algorithms (md5, sha1, sha224, sha256, sha382, sha512)

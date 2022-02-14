@@ -106,10 +106,79 @@ func leftRight(state CrackState) CrackState {
 	return state;
 }
 
+func rightLeft(state CrackState) CrackState {
+	state.StartTime = time.Seconds();
+	state.Iterations = 0;
+	deltaIndex := int(math.Ceil(float64(len(state.Dictionary) - 1)) / float64(state.Threads));
+	var threads []*Thread;
+	running := true;
+
+	if (state.Threads > 1) {
+		for i := 0; i < state.Threads; i++ {
+			endIndex := i * deltaIndex + deltaIndex;
+
+			if (i == state.Threads - 1) {
+				endIndex = len(state.Dictionary);
+			}
+
+			thread := Thread{
+				Index: i,
+				EndIndex: endIndex,
+				Running: true,
+			};
+
+			threads = append(threads, &thread);
+
+			go func() {
+				// This is why we need ternary ops
+				padding := 1;
+
+				if (thread.Index == 0) {
+					padding = 0;
+				}
+
+				for i := thread.Index * deltaIndex + padding; i < endIndex; i++ { // Dictionary entries
+					state.Iterations++;
+					thread.EntryIndex = i;
+	
+					if (time.Seconds() - state.StartTime >= state.MaxTime || thread.EntryIndex >= thread.EndIndex - 1) { 
+						thread.Running = false; 
+					}
+	
+					plaintext := state.Dictionary[len(state.Dictionary) - 1 - i];
+					cracked, index := crackHash(plaintext, state);
+					
+					if (cracked != "") {
+						state = handleFound(cracked, index, state);
+					}
+				}
+			}();
+		}
+	} else { // I'll handle this later
+	}
+
+	for (running) {
+		running = false;
+
+		for _, thread := range threads {
+			if (thread.Running) {
+				running = true;
+			}
+		}
+	}
+
+	return state;
+}
+
 func DictionaryAttack(state CrackState) CrackState {
 	switch (state.CrackingMode) {
 		case ("left-right"):
 			state = leftRight(state);
+
+			break;
+
+		case ("right-left"):
+			state = rightLeft(state);
 
 			break;
 

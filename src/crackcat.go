@@ -102,7 +102,7 @@ func main() {
 			fmt.Printf("Dictionary: %d entries", dictionarySize);
 		}
 				
-		io.CreateDirectory(*sessionName);
+		io.CreateDirectory("./" + *sessionName);
 		io.WriteFile("./" + *sessionName + "/dictionary_" + Ftime.Now().Format("01-02-2006 03_04_05") + ".txt", strings.Join(dictionary, "\n"));
 	} else if (*optimizeEntries) {
 		dictionary = optimization.RemoveDuplicates(dictionary);
@@ -117,8 +117,9 @@ func main() {
 
 	if (*algorithm == "auto") {
 		*algorithm = detectedAlgorithm;
-	} else if (detectedAlgorithm != *algorithm) {
-		fmt.Println("warning: The specified hashing algorithm does not match the detected hashin algorithm. Make sure the supplied algorithm matches the specified algorithm\n");
+		fmt.Printf("Auto detected %s as the hashing algorithm\n\n", detectedAlgorithm);
+	} else if (detectedAlgorithm != *algorithm && !*prehash) {
+		fmt.Println("warning: The specified hashing algorithm does not match the detected hashing algorithm. Make sure the supplied algorithm matches the specified algorithm\n");
 	}
 
 	if (*prehash) {
