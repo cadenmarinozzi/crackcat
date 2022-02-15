@@ -91,6 +91,29 @@ func leftRight(state CrackState) CrackState {
 			}();
 		}
 	} else { // I'll handle this later
+		thread := Thread{
+			Index: i,
+			EndIndex: len(state.Dictionary),
+			Running: true,
+		};
+
+		threads = append(threads, &thread);
+
+		for i := 0; i < thread.EndIndex; i++ { // Dictionary entries
+			state.Iterations++;
+			thread.EntryIndex = i;
+
+			if (time.Seconds() - state.StartTime >= state.MaxTime || thread.EntryIndex >= thread.EndIndex - 1) { 
+				thread.Running = false; 
+			}
+
+			plaintext := state.Dictionary[i];
+			cracked, index := crackHash(plaintext, state);
+			
+			if (cracked != "") {
+				state = handleFound(cracked, index, state);
+			}
+		}
 	}
 
 	for (running) {
@@ -155,6 +178,29 @@ func rightLeft(state CrackState) CrackState {
 			}();
 		}
 	} else { // I'll handle this later
+		thread := Thread{
+			Index: i,
+			EndIndex: len(state.Dictionary),
+			Running: true,
+		};
+
+		threads = append(threads, &thread);
+
+		for i := 0; i < thread.EndIndex; i++ { // Dictionary entries
+			state.Iterations++;
+			thread.EntryIndex = i;
+
+			if (time.Seconds() - state.StartTime >= state.MaxTime || thread.EntryIndex >= thread.EndIndex - 1) { 
+				thread.Running = false; 
+			}
+
+			plaintext := state.Dictionary[len(state.Dictionary) - 1 - i];
+			cracked, index := crackHash(plaintext, state);
+			
+			if (cracked != "") {
+				state = handleFound(cracked, index, state);
+			}
+		}
 	}
 
 	for (running) {
