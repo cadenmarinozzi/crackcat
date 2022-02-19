@@ -32,8 +32,7 @@ func handleFound(found string, index int, state CrackState) CrackState {
 
 	if (state.LogFound) {
 		if (state.SameLineLogs && len(state.Found) > 1) {
-			fmt.Printf("\033[1A");
-			fmt.Printf("\033[2K");
+			fmt.Printf("\033[1A\033[2K");
 		}
 
 		fmt.Printf("%s:%s\n", state.Passwords[index], found);

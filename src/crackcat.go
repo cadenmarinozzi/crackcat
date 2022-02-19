@@ -21,7 +21,7 @@ import (
 	"os"
 )
 
-var version string = "1.1.1a";
+var version string = "1.1.2a";
 
 func main() {
 	CPU, _ := cpu.Info();
