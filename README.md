@@ -28,20 +28,7 @@ You can run crackcat directly from the build directory by running `./crackcat.ex
 * Auto hash detecting
 
 ## TODO
-* CUDA/OpenCL kernels or parallel distributed computing
-* Salts
-* More hashing algorithms (WPA, etc)
-* More input/output file types (json, sql, etc)
-* Restore points
-* Status'
-* Hardware monitoring
-* Interactive element terminal
-* Bruteforce algorithms
-* More rules (Plaintext, etc)
-* Realtime progress monitoring
-* Random optimized rule generation
-* Username linking
-* Benchmarking
+See TODO for the TODO list. (lol)
 
 ## Troubleshooting
 
