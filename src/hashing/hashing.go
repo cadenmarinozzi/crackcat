@@ -11,8 +11,8 @@ import (
 	"crypto/sha1"
 	"crypto/sha256"
 	"crypto/sha512"
-	"golang.org/x/crypto/md4"
-	"golang.org/x/crypto/sha3"
+	"crypto/md4"
+	"crypto/sha3"
 	"hash"
 )
 
@@ -45,6 +45,11 @@ func Hash(input string, algorithm string) string {
 
 			break;
 
+		case ("keccak256"):
+			hashed = sha3.NewLegacyKeccak256();
+			
+			break;
+
 		case ("sha384"):
 			hashed = sha512.New384();
 
@@ -63,6 +68,11 @@ func Hash(input string, algorithm string) string {
 		case ("sha3-512"):
 			hashed = sha3.New512();
 
+			break;
+
+		case ("keccak512"):
+			hashed = sha3.NewLegacyKeccak512();
+			
 			break;
 
 		case ("md5"):
