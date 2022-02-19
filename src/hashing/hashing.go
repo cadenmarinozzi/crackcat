@@ -11,8 +11,9 @@ import (
 	"crypto/sha1"
 	"crypto/sha256"
 	"crypto/sha512"
-	"crypto/md4"
-	"crypto/sha3"
+	"golang.org/x/crypto/ripemd160"
+	"golang.org/x/crypto/md4"
+	"golang.org/x/crypto/sha3"
 	"hash"
 )
 
@@ -20,6 +21,11 @@ func Hash(input string, algorithm string) string {
 	var hashed hash.Hash;
              
 	switch (algorithm) {
+		case ("ripemd160"):
+			hashed = ripemd160.New();
+
+			break;
+
 		case ("sha1"):
 			hashed = sha1.New();
 
