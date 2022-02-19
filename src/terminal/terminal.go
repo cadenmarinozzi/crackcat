@@ -58,6 +58,7 @@ func Cracked(state cracking.CrackState) {
 	fmt.Printf("Start time......: %d (%s)\n", state.StartTime, state.FormattedStartTime);
 	fmt.Printf("End time........: %d (%s)\n", state.EndTime, state.FormattedEndTime);
 	fmt.Printf("Time taken......: %d seconds\n", state.EndTime - state.StartTime);
+	fmt.Printf("Speed...........: %d passwords per second\n", len(state.Found) / state.MaxTime);
 	fmt.Printf("Iterations......: %d\n", state.Iterations);
 	fmt.Printf("Found...........: %d passwords (%d%% of %d passwords)\n", len(state.Found), foundPercent, state.NPasswords);
 	fmt.Printf("Algorithm.......: %s", state.Algorithm);

@@ -53,6 +53,7 @@ func main() {
 	crackingMode := flag.String("cracking_mode", "left-right", "The direction mode to use to crack the hashes");
 
 	logFound := flag.Bool("log_found", false, "Whether to log the found passwords to the terminal");
+	sameLineLogs := flag.Bool("sameline_logs", true, "Whether logged passwords should overwrite the last logged password line");
 	removeFound := flag.Bool("remove_found", true, "Whether to remove the found passwords from the list to increase performance"); // I don't really know why you wouldn't want to do this
 	
 	flag.Parse();
@@ -67,6 +68,10 @@ func main() {
 
 	if (*threads > cores) {
 		fmt.Println("warning: The number of threads supplied is greater than the number of cores on the device, this could cause performance issues in the future\n");
+	}
+
+	if (*logFound) {
+		fmt.Println("warning: Logging found passwords results in crackcat cracking slower, log_found should not be used for general purposes\n");
 	}
 
 	terminal.Optimizers(map[string]bool{
@@ -147,6 +152,7 @@ func main() {
 		RemoveFound: *removeFound,
 		NPasswords: len(passwords),
 		SessionName: *sessionName,
+		SameLineLogs: *sameLineLogs,
 		FormattedStartTime: Ftime.Now().Format("03:04:05 PM"),
 	};
 

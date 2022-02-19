@@ -28,6 +28,7 @@ type CrackState struct {
 
 	RemoveFound bool;
 	LogFound bool;
+	SameLineLogs bool;
 
 	FormattedStartTime string;
 	FormattedEndTime string;
