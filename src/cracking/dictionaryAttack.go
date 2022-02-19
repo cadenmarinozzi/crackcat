@@ -12,10 +12,12 @@ import (
 	"math"
 )
 
-func crackHash(plaintext string, state CrackState) (found string, index int) {
-	hash := hashing.Hash(plaintext, state.Algorithm);
+var globalState CrackState; // No need to keep passing the state around in the same file
 
-	for i, hashed := range state.Passwords {
+func crackHash(plaintext string) (found string, index int) {
+	hash := hashing.Hash(plaintext, globalState.Algorithm);
+
+	for i, hashed := range globalState.Passwords {
 		if (hashed == hash) {
 			found = plaintext;
 			index = i;
@@ -27,38 +29,35 @@ func crackHash(plaintext string, state CrackState) (found string, index int) {
 	return found, index;
 }
 
-func handleFound(found string, index int, state CrackState) CrackState {
-	state.Found = append(state.Found, found);
+func handleFound(found string, index int) {
+	globalState.Found = append(globalState.Found, found);
 
-	if (state.LogFound) {
-		if (state.SameLineLogs && len(state.Found) > 1) {
+	if (globalState.LogFound) { // This really shouldn't be multi threaded
+		if (globalState.SameLineLogs && len(globalState.Found) > 1) {
 			fmt.Printf("\033[1A\033[2K");
 		}
 
-		fmt.Printf("%s:%s\n", state.Passwords[index], found);
+		fmt.Printf("%s:%s\n", globalState.Passwords[index], found);
 	}
 
-	if (state.RemoveFound && len(state.Passwords) > index) {
-		state.Passwords[index] = state.Passwords[len(state.Passwords) - 1];
-		state.Passwords = state.Passwords[:len(state.Passwords) - 1];
+	if (globalState.RemoveFound && len(globalState.Passwords) > index) {
+		globalState.Passwords[index] = globalState.Passwords[len(globalState.Passwords) - 1];
+		globalState.Passwords = globalState.Passwords[:len(globalState.Passwords) - 1];
 	}
-
-	return state;
 }
 
-func process(state CrackState) CrackState {
-	state.StartTime = time.Seconds();
-	state.Iterations = 0;
-	deltaIndex := int(math.Ceil(float64(len(state.Dictionary) - 1)) / float64(state.Threads));
+func process() {
+	globalState.StartTime = time.Seconds();
+	deltaIndex := int(math.Ceil(float64(len(globalState.Dictionary) - 1)) / float64(globalState.Threads));
 	var threads []*Thread;
 	running := true;
 
-	if (state.Threads > 1) {
-		for i := 0; i < state.Threads; i++ {
+	if (globalState.Threads > 1) {
+		for i := 0; i < globalState.Threads; i++ {
 			endIndex := i * deltaIndex + deltaIndex;
 
-			if (i == state.Threads - 1) {
-				endIndex = len(state.Dictionary);
+			if (i == globalState.Threads - 1) {
+				endIndex = len(globalState.Dictionary);
 			}
 
 			thread := Thread{
@@ -78,31 +77,31 @@ func process(state CrackState) CrackState {
 				}
 
 				for i := thread.Index * deltaIndex + padding; i < endIndex; i++ { // Dictionary entries
-					state.Iterations++;
+					globalState.Iterations++;
 					thread.EntryIndex = i;
 	
-					if (time.Seconds() - state.StartTime >= state.MaxTime || thread.EntryIndex >= thread.EndIndex - 1) { 
+					if (time.Seconds() - globalState.StartTime >= globalState.MaxTime || thread.EntryIndex >= thread.EndIndex - 1) { 
 						thread.Running = false; 
 					}
 	
 					var plaintext string;
 
-					switch (state.CrackingMode) {
+					switch (globalState.CrackingMode) {
 						case ("left-right"):
-							plaintext = state.Dictionary[i];
+							plaintext = globalState.Dictionary[i];
 
 							break;
 
 						case ("right-left"):
-							plaintext = state.Dictionary[len(state.Dictionary) - 1 - i];
+							plaintext = globalState.Dictionary[len(globalState.Dictionary) - 1 - i];
 
 							break;
 					}
 
-					cracked, index := crackHash(plaintext, state);
+					cracked, index := crackHash(plaintext);
 					
 					if (cracked != "") {
-						state = handleFound(cracked, index, state);
+						handleFound(cracked, index);
 					}
 				}
 			}();
@@ -110,25 +109,25 @@ func process(state CrackState) CrackState {
 	} else { // I'll handle this later
 		thread := Thread{
 			Index: 0,
-			EndIndex: len(state.Dictionary),
+			EndIndex: len(globalState.Dictionary),
 			Running: true,
 		};
 
 		threads = append(threads, &thread);
 
 		for i := 0; i < thread.EndIndex; i++ { // Dictionary entries
-			state.Iterations++;
+			globalState.Iterations++;
 			thread.EntryIndex = i;
 
-			if (time.Seconds() - state.StartTime >= state.MaxTime || thread.EntryIndex >= thread.EndIndex - 1) { 
+			if (time.Seconds() - globalState.StartTime >= globalState.MaxTime || thread.EntryIndex >= thread.EndIndex - 1) { 
 				thread.Running = false; 
 			}
 
-			plaintext := state.Dictionary[i];
-			cracked, index := crackHash(plaintext, state);
+			plaintext := globalState.Dictionary[i];
+			cracked, index := crackHash(plaintext);
 			
 			if (cracked != "") {
-				state = handleFound(cracked, index, state);
+				handleFound(cracked, index);
 			}
 		}
 	}
@@ -142,13 +141,12 @@ func process(state CrackState) CrackState {
 			}
 		}
 	}
-
-	return state;
 }
 
 
 func DictionaryAttack(state CrackState) CrackState {
-	state = process(state);
+	globalState = state;
+	process();
 
-	return state;
+	return globalState;
 }
