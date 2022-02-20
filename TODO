@@ -1,7 +1,6 @@
 * Allow threads to work on uncracked entries from other threads
 * CUDA/OpenCL kernels or parallel distributed computing
 * Salts
-* More hashing algorithms (WPA, etc)
 * More input/output file types (json, sql, csv, pdf, etc)
 * Restore points
 * Status'

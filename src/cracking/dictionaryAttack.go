@@ -49,6 +49,7 @@ func handleFound(found string, index int) {
 func process() {
 	globalState.StartTime = time.Seconds();
 	deltaIndex := int(math.Ceil(float64(len(globalState.Dictionary) - 1)) / float64(globalState.Threads));
+
 	var threads []*Thread;
 	running := true;
 
@@ -60,23 +61,23 @@ func process() {
 				endIndex = len(globalState.Dictionary);
 			}
 
+			padding := 1;
+
+			if (i == 0) {
+				padding = 0;
+			}
+
 			thread := Thread{
 				Index: i,
 				EndIndex: endIndex,
+				StartIndex: i * deltaIndex + padding,
 				Running: true,
 			};
 
 			threads = append(threads, &thread);
 
 			go func() {
-				// This is why we need ternary ops
-				padding := 1;
-
-				if (thread.Index == 0) {
-					padding = 0;
-				}
-
-				for i := thread.Index * deltaIndex + padding; i < endIndex; i++ { // Dictionary entries
+				for i := thread.StartIndex; i < thread.EndIndex; i++ { // Dictionary entries
 					globalState.Iterations++;
 					thread.EntryIndex = i;
 	
@@ -106,7 +107,7 @@ func process() {
 				}
 			}();
 		}
-	} else { // I'll handle this later
+	} else {
 		thread := Thread{
 			Index: 0,
 			EndIndex: len(globalState.Dictionary),

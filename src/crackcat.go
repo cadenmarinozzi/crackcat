@@ -21,7 +21,7 @@ import (
 	"os"
 )
 
-var version string = "1.1.2a";
+var version string = "1.1.3a";
 
 func main() {
 	CPU, _ := cpu.Info();
@@ -57,6 +57,8 @@ func main() {
 	removeFound := flag.Bool("remove_found", true, "Whether to remove the found passwords from the list to increase performance"); // I don't really know why you wouldn't want to do this
 	
 	flag.Parse();
+
+	io.CreateDirectory("./" + *sessionName);
 	
 	terminal.Header(version);
 
@@ -107,7 +109,6 @@ func main() {
 			fmt.Printf("Dictionary: %d entries", dictionarySize);
 		}
 				
-		io.CreateDirectory("./" + *sessionName);
 		io.WriteFile("./" + *sessionName + "/dictionary_" + Ftime.Now().Format("01-02-2006 03_04_05") + ".txt", strings.Join(dictionary, "\n"));
 	} else if (*optimizeEntries) {
 		dictionary = optimization.RemoveDuplicates(dictionary);

@@ -7,62 +7,8 @@ package rules
 
 import (
 	"strings"
-	"unicode"
 	"strconv"
 )
-
-func reverseString(input string) (reversed string) {
-	for _, character := range input {
-		reversed = string(character) + reversed;
-	}
-
-	return reversed;
-}
-
-func replaceCharacterAtX(input string, replacement string, x int) string {
-	inputLength := len(input) - 1;
-
-	if (inputLength > x) {
-		return input[:x] + replacement + input[x + 1:];
-	} else if (inputLength == x) {
-		return input[:x] + replacement;
-	}
-
-	return input;
-}
-
-func toggleCase(input string) string {
-	tempInput := []rune(input)
-
-	for i, char := range tempInput {
-		if unicode.IsUpper(char) {
-			tempInput[i] = unicode.ToLower(char)
-
-			continue
-		}
-
-		tempInput[i] = unicode.ToUpper(char)
-	}
-
-	return string(tempInput)
-}
-
-func toggleCaseAtX(input string, x int) string {
-	if (len(input) - 1 >= x) {
-		tempInput := []rune(input);
-		character := tempInput[x];
-
-		if (unicode.IsUpper(character)) {
-			tempInput[x] = unicode.ToLower(character);
-		} else {
-			tempInput[x] = unicode.ToUpper(character);
-		}
-
-		return string(tempInput);
-	}
-
-	return input;
-}
 
 func GenerateRules(dictionary []string, rulesList []string) (newDictionary []string) {
 	var memory string;
@@ -110,19 +56,19 @@ func GenerateRules(dictionary []string, rulesList []string) (newDictionary []str
 						break;
 	
 					case ("t"): // Toggle case
-						newEntry = toggleCase(newEntry);
+						newEntry = ToggleCase(newEntry);
 
 						break;
 	
 					case ("T"): // Toggle case at index
 						position++;
 						index, _ := strconv.Atoi(string(rules[position]));
-						toggleCaseAtX(newEntry, index);
+						ToggleCaseAtX(newEntry, index);
 
 						break;
 
 					case ("r"): // Reverse
-						newEntry = reverseString(newEntry);
+						newEntry = ReverseString(newEntry);
 
 						break;
 
@@ -143,7 +89,7 @@ func GenerateRules(dictionary []string, rulesList []string) (newDictionary []str
 						break;
 
 					case ("f"): // Mirror
-						newEntry += reverseString(newEntry);
+						newEntry += ReverseString(newEntry);
 
 						break;
 
@@ -183,7 +129,7 @@ func GenerateRules(dictionary []string, rulesList []string) (newDictionary []str
 						position++;
 						n, _ := strconv.Atoi(string(rules[position]));
 
-						newEntry = replaceCharacterAtX(newEntry, "", n);
+						newEntry = ReplaceCharacterAtX(newEntry, "", n);
 
 						break;
 
@@ -225,7 +171,7 @@ func GenerateRules(dictionary []string, rulesList []string) (newDictionary []str
 						X := string(rules[position + 2]);
 						position += 2;
 
-						newEntry = replaceCharacterAtX(newEntry, X, N);
+						newEntry = ReplaceCharacterAtX(newEntry, X, N);
 
 						break;
 

@@ -5,13 +5,11 @@
 
 package cracking
 
-// type callback func(*Thread)
-
 type Thread struct {
 	Index int;
 	EntryIndex int;
 	EndIndex int;
+	StartIndex int;
 	
 	Running bool;
-	// Callback callback;
 }
