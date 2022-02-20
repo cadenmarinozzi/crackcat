@@ -88,7 +88,14 @@ func main() {
 		dictionary = dictionary[:*dictionaryCutoff];
 	}	
 
-	fmt.Printf("Passwords: %d entries\n", len(passwords));
+	passwordsSize := len(passwords);
+
+	if (*optimizeEntries) {
+		passwords = optimization.RemoveEmptyHashes(passwords, *algorithm);
+		fmt.Printf("Passwords: %d entries, %d optimized entries\n", passwordsSize, len(passwords));
+	} else {
+		fmt.Printf("Passwords: %d entries\n", passwordsSize);
+	}
 
 	dictionarySize := len(dictionary);
 
