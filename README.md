@@ -21,11 +21,14 @@ You can run crackcat directly from the build directory by running `./crackcat.ex
 ## Features
 * Distributed multi threaded cracking
 * Attack methods (Dictionary)
+* Rules
+* Large platform compatability 
 * Attack modes (left-right, right-left)
 * Dictionary/rules optimization
 * Time limiting
 * Quite a few Hashing algorithms
 * Auto hash detecting
+* Benchmarking
 
 ## TODO
 See TODO for the TODO list. (lol)
