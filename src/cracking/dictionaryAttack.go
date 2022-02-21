@@ -10,17 +10,22 @@ import (
 	"main/hashing"
 	"fmt"
 	"math"
+	"os"
 )
 
 var globalState CrackState; // No need to keep passing the state around in the same file
 
+/*
+* This is the function that goes through the hashed password list to compare the plaintext-
+	entry to the hash
+**/
 func crackHash(plaintext string) (found string, index int) {
 	hash := hashing.Hash(plaintext, globalState.Algorithm);
 
 	for i, hashed := range globalState.Passwords {
 		if (hashed == hash) {
 			found = plaintext;
-			index = i;
+			index = i; // We need the index for removing the password later on 
 
 			break;
 		}
@@ -29,6 +34,9 @@ func crackHash(plaintext string) (found string, index int) {
 	return found, index;
 }
 
+/*
+* Handle the found password. This means logging it, removing it, etc
+**/
 func handleFound(found string, index int) {
 	globalState.Found = append(globalState.Found, found);
 
@@ -46,8 +54,13 @@ func handleFound(found string, index int) {
 	}
 }
 
-func process() {
+func DictionaryAttack(state CrackState) CrackState {
+	globalState = state;
 	globalState.StartTime = time.Seconds();
+
+	/* This really sucks. I need to figure out a better way to do this since it causes some entries-
+		to get missed, depending on the number of threads
+	*/
 	deltaIndex := int(math.Ceil(float64(len(globalState.Dictionary) - 1)) / float64(globalState.Threads));
 
 	var threads []*Thread;
@@ -55,6 +68,7 @@ func process() {
 
 	if (globalState.Threads > 1) {
 		for i := 0; i < globalState.Threads; i++ {
+			// These next 11 lines could be 2 lines if go didn't suck and actually had ternary ops
 			endIndex := i * deltaIndex + deltaIndex;
 
 			if (i == globalState.Threads - 1) {
@@ -74,9 +88,9 @@ func process() {
 				Running: true,
 			};
 
-			threads = append(threads, &thread);
+			threads = append(threads, &thread); // We insert the address so that the main thread can access the threads
 
-			go func() {
+			go func() { // goroutines oh goroutines I love you very much
 				for i := thread.StartIndex; i < thread.EndIndex; i++ { // Dictionary entries
 					globalState.Iterations++;
 					thread.EntryIndex = i;
@@ -97,6 +111,12 @@ func process() {
 							plaintext = globalState.Dictionary[len(globalState.Dictionary) - 1 - i];
 
 							break;
+
+						default:
+							fmt.Println("Unsupported cracking mode");
+							os.Exit(1);
+						
+							break; // This doesn't need to be here but eh
 					}
 
 					cracked, index := crackHash(plaintext);
@@ -116,12 +136,15 @@ func process() {
 
 		threads = append(threads, &thread);
 
-		for i := 0; i < thread.EndIndex; i++ { // Dictionary entries
+		// Same stuff as before except we just go through all of the entries in one thread
+		for i := 0; i < thread.EndIndex; i++ {
 			globalState.Iterations++;
 			thread.EntryIndex = i;
 
 			if (time.Seconds() - globalState.StartTime >= globalState.MaxTime || thread.EntryIndex >= thread.EndIndex - 1) { 
 				thread.Running = false; 
+
+				break;
 			}
 
 			plaintext := globalState.Dictionary[i];
@@ -142,12 +165,6 @@ func process() {
 			}
 		}
 	}
-}
-
-
-func DictionaryAttack(state CrackState) CrackState {
-	globalState = state;
-	process();
 
 	return globalState;
 }

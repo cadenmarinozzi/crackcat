@@ -1,7 +1,7 @@
 * Allow threads to work on uncracked entries from other threads
 * CUDA/OpenCL kernels or parallel distributed computing
 * Salts
-* More input/output file types (json, sql, csv, pdf, etc)
+* More input/output file types (json, csv, pdf, etc)
 * Restore points
 * Status'
 * Hardware monitoring
@@ -11,4 +11,3 @@
 * Realtime progress monitoring
 * Random optimized rule generation
 * Username linking
-* Benchmarking

@@ -10,6 +10,12 @@ import (
 	"math"
 )
 
+/* 
+* Both this file and the storageSize file SUCK. I have no clue why but different terminals make these-
+	functions return different values???!!!?!?!?!?!????
+* I have genuinely no clue why as the code is extremely simple and not dependent on anything like that.
+*/
+
 var clockSpeeds = map[string]int{
 	"Hz": 1,
 	"KHz": 1000,
