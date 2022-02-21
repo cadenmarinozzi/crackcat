@@ -17,7 +17,7 @@ cd src
 go build crackcat.go
 `
 This will build the crackcat code to an executable called `crackcat.exe`. 
-You can run crackcat directly from the build directory by running `./crackcat.exe` or `crackcat.exe` (Depending on the console), or you can add it to the system PATH and run it from any command line. To add it to the system PATH on Windows, copy the path to the directory crackcat.exe is in, go to the Windows search and type system environment variables, click Environment Variables on the bottom right, in User Variables, double click "Path" and then click "New". Paste the directory path and then click ok to exit out. (You will need to restart any command line instances you currently have open for them to refresh their PATH)
+You can run crackcat directly from the build directory by running `./crackcat.exe` or `crackcat.exe` (Depending on the console), or you can add it to the system PATH and run it from any command line. To add it to the system PATH on Windows, copy the path to the directory crackcat.exe is in, go to the Windows search and type `system environment variables`, click "Environment Variables" on the bottom right, in "User Variables", double click "Path" and then click "New". Paste the directory path and then click ok to exit out. (You will need to restart any command line instances you currently have open for them to refresh their PATH)
 ## Features
 * Distributed multi threaded cracking
 * Attack methods (Dictionary)
