@@ -10,22 +10,36 @@ import (
 	"strconv"
 )
 
+// This file is absolute hell. I do not recomment looking in here if you want to keep your sanity
+
 func GenerateRules(dictionary []string, rulesList []string) (newDictionary []string) {
 	var memory string;
+
+	/*
+	* Just to clarify:
+	* "rulesList" is an array containing each LINE of rules. So for example:
+		luc
+		$1 $2
+		^1 ^4 ^3
+	* And "rules" is the actual line, so "luc" or "$1 $2".
+	*
+	* rule is the actual character rule: "l", "u", "c", etc.
+	**/
 
 	for _, entry := range dictionary {
 		if (entry == "" || len(entry) == 0) { continue }
 
 		for _, rules := range rulesList {
+			// Just incase
 			if (rules == "" || rules == "\n") { continue }
 			if (len(rules) >= 2 && string(rules[:2]) == "##") { continue }
-			
-			newEntry := entry;
+
+			newEntry := entry; // We need a new entry variable so we can modify it based on the original value
 			position := 0;
 
-			for (position < len(rules)) {
-				rule := string(rules[position]);
-				newEntryLength := len(newEntry);
+			for (position < len(rules)) { // Go is very sneaky not having a while key word :D
+				rule := string(rules[position]); // I mean I could just handle it as a rune but eh
+				newEntryLength := len(newEntry); // Just so we don't need to call "len" alot
 
 				if (newEntry == "" || newEntryLength == 0) { continue }
 

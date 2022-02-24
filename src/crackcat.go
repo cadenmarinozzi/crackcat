@@ -9,6 +9,7 @@ import (
 	"main/terminal"
 	"main/io"
 	"main/cracking"
+	"main/benchmarking"
 	"main/hashing"
 	"main/time"
 	genRules "main/rules"
@@ -26,7 +27,8 @@ var version string = "1.1.3a";
 func main() {
 	CPU, _ := cpu.Info();
 	cores := int(CPU[0].Cores);
-	
+
+	// Handle all of the flags and terminal args
 	threads := flag.Int("threads", cores, "The number of threads to distribute the workload on");
 
 	passwordsFile := flag.String("passwords", "./examples/big_passwords1.txt", "The file holding the passwords to crack");
@@ -48,6 +50,7 @@ func main() {
 	optimizeEntries := flag.Bool("optimize_entries", true, "Whether to optimize the dictionary/rules entries");
 
 	maxTime := flag.Int("max_time", 60, "The maximum time to crack for");
+	benchmarkTime := flag.Int("benchmark_time", 1, "The maximum time to benchmark for");
 
 	crackingMethod := flag.String("cracking_method", "dictionary", "The method to use to crack the hashes");
 	crackingMode := flag.String("cracking_mode", "left-right", "The direction mode to use to crack the hashes");
@@ -63,11 +66,12 @@ func main() {
 	terminal.Header(version);
 
 	if (*watermark) {
-		terminal.Watermark(*kitty);
+		terminal.Watermark(*kitty); // kitty :3
 	}
 
 	terminal.Devices();
 
+	// This can cause some of the goroutines to be ignored so it's considered dangerous
 	if (*threads > cores) {
 		fmt.Println("warning: The number of threads supplied is greater than the number of cores on the device, this could cause performance issues in the future\n");
 	}
@@ -84,6 +88,7 @@ func main() {
 	passwords := io.ReadFileLines(*passwordsFile);
 	dictionary := io.ReadFileLines(*dictionaryFile);
 
+	// Dictionary cutoff is very, very, very important
 	if (*dictionaryCutoff != 0) {
 		dictionary = dictionary[:*dictionaryCutoff];
 	}	
@@ -148,6 +153,7 @@ func main() {
 
 	// Start cracking
 
+	// I could prob make a module to do this and handle the flags in one go but it's fine for now
 	state := cracking.CrackState{
 		Passwords: passwords,
 		Dictionary: dictionary,
@@ -161,11 +167,18 @@ func main() {
 		NPasswords: len(passwords),
 		SessionName: *sessionName,
 		SameLineLogs: *sameLineLogs,
+		BenchmarkTime: *benchmarkTime,
 		FormattedStartTime: Ftime.Now().Format("03:04:05 PM"),
 	};
 
+	benchmarkState := benchmarking.Benchmark(state);
+	state.EstimatedTime = len(state.Passwords) / benchmarkState.Hashed / state.BenchmarkTime;
+
+	fmt.Printf("Started cracking at %s\n\n", state.FormattedStartTime);
+
+	fmt.Printf("Estimated time..: %d seconds\n", state.EstimatedTime);
+
 	if (*device == "CPU") {
-		fmt.Printf("Started cracking at %s\n\n", state.FormattedStartTime);
 		state = cracking.Crack(state);
 
 		state.EndTime = time.Seconds();

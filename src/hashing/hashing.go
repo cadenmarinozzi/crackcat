@@ -17,6 +17,7 @@ import (
 	"hash"
 )
 
+// I really want to add more hashes like WPA and bcrypt but but my priority should be to optimzie these first
 func Hash(input string, algorithm string) string {
 	var hashed hash.Hash;
              

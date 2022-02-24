@@ -13,6 +13,8 @@ import (
 	"fmt"
 )
 
+// I HATE io stuff so all of it is handled here in simple functions
+
 func HandleFileError(err error) {
 	if (err == nil) { return }
 

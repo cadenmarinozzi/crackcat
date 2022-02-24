@@ -9,21 +9,21 @@ package cracking
 
 type CrackState struct {
 	SessionName string;
+	
 	Passwords []string;
 	Dictionary []string;
+	Found []string;
 	
 	Algorithm string;
 	Threads int;
 	MaxTime int;
+	BenchmarkTime int;
+	EstimatedTime int;
 
 	CrackingMethod string;
 	CrackingMode string;
 
-	Found []string;
-
 	Iterations int;
-	StartTime int;
-	EndTime int;
 	NPasswords int;
 
 	RemoveFound bool;
@@ -32,4 +32,6 @@ type CrackState struct {
 
 	FormattedStartTime string;
 	FormattedEndTime string;
+	StartTime int;
+	EndTime int;
 }
