@@ -67,8 +67,7 @@ func DictionaryAttack(state CrackState) CrackState {
 	running := true;
 
 	if (globalState.Threads > 1) {
-		for i := 0; i < globalState.Threads - 1; i++ {
-			// These next 11 lines could be 2 lines if go didn't suck and actually had ternary ops
+		for i := 0; i < globalState.Threads; i++ {
 			startIndex := i * deltaIndex;
 			endIndex := int(math.Min(float64(startIndex + deltaIndex), float64(len(globalState.Dictionary))));
 
@@ -79,17 +78,22 @@ func DictionaryAttack(state CrackState) CrackState {
 				Running: true,
 			};
 
+			if (i != 0) {
+				thread.StartIndex++;
+			}
+
 			threads = append(threads, &thread); // We insert the address so that the main thread can access the threads
 
 			go func() { // goroutines oh goroutines I love you very much
-				for (thread.EntryIndex < thread.EndIndex) {
-					if (time.Seconds() - globalState.StartTime >= globalState.MaxTime || thread.EntryIndex == thread.EndIndex - 1) { 
-						thread.Running = false; 
+				for i := thread.StartIndex; i < thread.EndIndex; i++ {
+					var plaintext string;
+					thread.EntryIndex = i;
 
+					if (time.Seconds() - globalState.StartTime >= globalState.MaxTime) {
+						thread.Running = false;
+			
 						break;
 					}
-	
-					var plaintext string;
 
 					switch (globalState.CrackingMode) {
 						case ("left-right"):
@@ -114,56 +118,59 @@ func DictionaryAttack(state CrackState) CrackState {
 					}
 
 					globalState.Iterations++;
-					thread.EntryIndex++;
 				}
+
+				thread.Running = false;
 			}();
 		}
+	} else {
+		thread := Thread{
+			Index: 0,
+			EndIndex: len(globalState.Dictionary),
+			StartIndex: 0,
+			Running: true,
+		};
+
+		threads = append(threads, &thread); // We insert the address so that the main thread can access the threads
+
+		for i := thread.StartIndex; i < thread.EndIndex; i++ {
+			var plaintext string;
+			thread.EntryIndex = i;
+
+			if (time.Seconds() - globalState.StartTime >= globalState.MaxTime) {
+				thread.Running = false;
+	
+				break;
+			}
+
+			switch (globalState.CrackingMode) {
+				case ("left-right"):
+					plaintext = globalState.Dictionary[thread.EntryIndex];
+
+					break;
+
+				case ("right-left"):
+					plaintext = globalState.Dictionary[len(globalState.Dictionary) - 1 - thread.EntryIndex];
+
+					break;
+
+				default:
+					fmt.Println("Unsupported cracking mode");
+					os.Exit(1);
+			}
+
+			cracked, index := crackHash(plaintext);
+			
+			if (cracked != "") {
+				handleFound(cracked, index);
+			}
+
+			globalState.Iterations++;
+		}
+
+		thread.Running = false;
 	}
 	
-	thread := Thread{
-		Index: threads[len(threads) - 1].EndIndex + 1,
-		EndIndex: len(globalState.Dictionary),
-		Running: true,
-	};
-
-	threads = append(threads, &thread);
-
-	// Same stuff as before except we just go through all of the entries in one thread
-	for (thread.EntryIndex < thread.EndIndex) {
-		if (time.Seconds() - globalState.StartTime >= globalState.MaxTime || thread.EntryIndex == thread.EndIndex - 1) { 
-			thread.Running = false; 
-
-			break;
-		}
-
-		var plaintext string;
-
-		switch (globalState.CrackingMode) {
-			case ("left-right"):
-				plaintext = globalState.Dictionary[thread.EntryIndex];
-
-				break;
-
-			case ("right-left"):
-				plaintext = globalState.Dictionary[len(globalState.Dictionary) - 1 - thread.EntryIndex];
-
-				break;
-
-			default:
-				fmt.Println("Unsupported cracking mode");
-				os.Exit(1);
-		}
-		
-		cracked, index := crackHash(plaintext);
-		
-		if (cracked != "") {
-			handleFound(cracked, index);
-		}
-
-		globalState.Iterations++;
-		thread.EntryIndex++;
-	}
-
 	for (running) {
 		running = false;
 
