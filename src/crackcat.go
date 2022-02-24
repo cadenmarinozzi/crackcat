@@ -73,7 +73,7 @@ func main() {
 
 	// This can cause some of the goroutines to be ignored so it's considered dangerous
 	if (*threads > cores) {
-		fmt.Println("warning: The number of threads supplied is greater than the number of cores on the device, this could cause performance issues in the future\n");
+		fmt.Println("warning: The number of threads supplied is greater than the number of cores on the device, this could cause performance issues\n");
 	}
 
 	if (*logFound) {

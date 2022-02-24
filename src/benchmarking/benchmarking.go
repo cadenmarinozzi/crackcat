@@ -1,3 +1,8 @@
+/*
+	author....: nekumelon
+	License...: MIT (Check LICENSE)
+*/
+
 package benchmarking
 
 import (
@@ -22,6 +27,13 @@ func crackHash(plaintext string) (found string) {
 	}
 
 	return found;
+}
+
+func handleFound(found string, index int) {
+	if (globalState.RemoveFound && len(globalState.Passwords) > index) {
+		globalState.Passwords[index] = globalState.Passwords[len(globalState.Passwords) - 1];
+		globalState.Passwords = globalState.Passwords[:len(globalState.Passwords) - 1];
+	}
 }
 
 func Benchmark(state cracking.CrackState) BenchmarkState {

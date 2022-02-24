@@ -59,64 +59,52 @@ func DictionaryAttack(state CrackState) CrackState {
 	globalState.StartTime = time.Seconds();
 
 	/* This really sucks. I need to figure out a better way to do this since it causes some entries-
-		to get missed, depending on the number of threads
+		to get missed, depending on the thread speed
 	*/
-	deltaIndex := int(math.Ceil(float64(len(globalState.Dictionary) - 1)) / float64(globalState.Threads));
-
+	deltaIndex := (len(globalState.Dictionary) + globalState.Threads - 1) / globalState.Threads;
+	
 	var threads []*Thread;
 	running := true;
 
 	if (globalState.Threads > 1) {
-		for i := 0; i < globalState.Threads; i++ {
+		for i := 0; i < globalState.Threads - 1; i++ {
 			// These next 11 lines could be 2 lines if go didn't suck and actually had ternary ops
-			endIndex := i * deltaIndex + deltaIndex;
-
-			if (i == globalState.Threads - 1) {
-				endIndex = len(globalState.Dictionary);
-			}
-
-			padding := 1;
-
-			if (i == 0) {
-				padding = 0;
-			}
+			startIndex := i * deltaIndex;
+			endIndex := int(math.Min(float64(startIndex + deltaIndex), float64(len(globalState.Dictionary))));
 
 			thread := Thread{
 				Index: i,
 				EndIndex: endIndex,
-				StartIndex: i * deltaIndex + padding,
+				StartIndex: startIndex,
 				Running: true,
 			};
 
 			threads = append(threads, &thread); // We insert the address so that the main thread can access the threads
 
 			go func() { // goroutines oh goroutines I love you very much
-				for i := thread.StartIndex; i < thread.EndIndex; i++ { // Dictionary entries
-					globalState.Iterations++;
-					thread.EntryIndex = i;
-	
-					if (time.Seconds() - globalState.StartTime >= globalState.MaxTime || thread.EntryIndex >= thread.EndIndex - 1) { 
+				for (thread.EntryIndex < thread.EndIndex) {
+					if (time.Seconds() - globalState.StartTime >= globalState.MaxTime || thread.EntryIndex == thread.EndIndex - 1) { 
 						thread.Running = false; 
+
+						break;
 					}
 	
 					var plaintext string;
 
 					switch (globalState.CrackingMode) {
 						case ("left-right"):
-							plaintext = globalState.Dictionary[i];
+							plaintext = globalState.Dictionary[thread.EntryIndex];
 
 							break;
 
 						case ("right-left"):
-							plaintext = globalState.Dictionary[len(globalState.Dictionary) - 1 - i];
+							plaintext = globalState.Dictionary[len(globalState.Dictionary) - 1 - thread.EntryIndex];
 
 							break;
 
 						default:
 							fmt.Println("Unsupported cracking mode");
 							os.Exit(1);
-						
-							break; // This doesn't need to be here but eh
 					}
 
 					cracked, index := crackHash(plaintext);
@@ -124,36 +112,56 @@ func DictionaryAttack(state CrackState) CrackState {
 					if (cracked != "") {
 						handleFound(cracked, index);
 					}
+
+					globalState.Iterations++;
+					thread.EntryIndex++;
 				}
 			}();
 		}
-	} else {
-		thread := Thread{
-			Index: 0,
-			EndIndex: len(globalState.Dictionary),
-			Running: true,
-		};
+	}
+	
+	thread := Thread{
+		Index: threads[len(threads) - 1].EndIndex + 1,
+		EndIndex: len(globalState.Dictionary),
+		Running: true,
+	};
 
-		threads = append(threads, &thread);
+	threads = append(threads, &thread);
 
-		// Same stuff as before except we just go through all of the entries in one thread
-		for i := 0; i < thread.EndIndex; i++ {
-			globalState.Iterations++;
-			thread.EntryIndex = i;
+	// Same stuff as before except we just go through all of the entries in one thread
+	for (thread.EntryIndex < thread.EndIndex) {
+		if (time.Seconds() - globalState.StartTime >= globalState.MaxTime || thread.EntryIndex == thread.EndIndex - 1) { 
+			thread.Running = false; 
 
-			if (time.Seconds() - globalState.StartTime >= globalState.MaxTime || thread.EntryIndex >= thread.EndIndex - 1) { 
-				thread.Running = false; 
+			break;
+		}
+
+		var plaintext string;
+
+		switch (globalState.CrackingMode) {
+			case ("left-right"):
+				plaintext = globalState.Dictionary[thread.EntryIndex];
 
 				break;
-			}
 
-			plaintext := globalState.Dictionary[i];
-			cracked, index := crackHash(plaintext);
-			
-			if (cracked != "") {
-				handleFound(cracked, index);
-			}
+			case ("right-left"):
+				plaintext = globalState.Dictionary[len(globalState.Dictionary) - 1 - thread.EntryIndex];
+
+				break;
+
+			default:
+				fmt.Println("Unsupported cracking mode");
+				os.Exit(1);
 		}
+		
+		cracked, index := crackHash(plaintext);
+		
+		if (cracked != "") {
+			handleFound(cracked, index);
+		}
+
+		globalState.Iterations++;
+		thread.EntryIndex++;
 	}
 
 	for (running) {
