@@ -10,6 +10,5 @@ type Thread struct {
 	EntryIndex int;
 	EndIndex int;
 	StartIndex int;
-	
-	Running bool;
+	Found []string;
 }

@@ -61,6 +61,20 @@ func main() {
 	
 	flag.Parse();
 
+	state := cracking.CrackState{
+		Algorithm: *algorithm,
+		MaxTime: *maxTime,
+		Threads: *threads,
+		CrackingMethod: *crackingMethod,
+		CrackingMode: *crackingMode,
+		LogFound: *logFound,
+		RemoveFound: *removeFound,
+		SessionName: *sessionName,
+		SameLineLogs: *sameLineLogs,
+		BenchmarkTime: *benchmarkTime,
+		FormattedStartTime: Ftime.Now().Format("03:04:05 PM"),
+	};
+
 	io.CreateDirectory("./" + *sessionName);
 	
 	terminal.Header(version);
@@ -70,6 +84,12 @@ func main() {
 	}
 
 	terminal.Devices();
+
+	// Causes a paradox if you need to know the hashing algorithm to prehash but also need to detect the algorithm
+	if (*prehash && *algorithm == "auto") {
+		fmt.Println("Cannot prehash if the algorithm is not defined");
+		os.Exit(1);
+	}
 
 	// This can cause some of the goroutines to be ignored so it's considered dangerous
 	if (*threads > cores) {
@@ -84,15 +104,17 @@ func main() {
 		"optimize_entries": *optimizeEntries,
 		"remove_found": *removeFound,
 	});
-
-	passwords := io.ReadFileLines(*passwordsFile);
+	
+	// Load the passwords and dictionary entries from the files
 	dictionary := io.ReadFileLines(*dictionaryFile);
 
-	// Dictionary cutoff is very, very, very important
 	if (*dictionaryCutoff != 0) {
 		dictionary = dictionary[:*dictionaryCutoff];
 	}	
 
+	dictionarySize := len(dictionary);
+
+	passwords := io.ReadFileLines(*passwordsFile);
 	passwordsSize := len(passwords);
 
 	if (*optimizeEntries) {
@@ -102,29 +124,26 @@ func main() {
 		fmt.Printf("Passwords: %d entries\n", passwordsSize);
 	}
 
-	dictionarySize := len(dictionary);
-
 	if (*rulesFile != "") {
 		rules := io.ReadFileLines(*rulesFile);
 		rulesSize := len(rules);
-
-		dictionary = genRules.GenerateRules(dictionary, rules);
 
 		if (*optimizeEntries) {
 			rules = optimization.RemoveDuplicates(rules);
 			fmt.Printf("Rules: %d rules, %d optimized rules\n", rulesSize, len(rules));
 
-			dictionary = optimization.RemoveDuplicates(dictionary);
+			dictionary = optimization.RemoveDuplicates(genRules.GenerateRules(dictionary, rules));
 			fmt.Printf("Dictionary: %d entries, %d optimized entries\n", dictionarySize, len(dictionary));
 		} else {
 			fmt.Printf("Rules: %d rules\n", rulesSize);
 			fmt.Printf("Dictionary: %d entries", dictionarySize);
 		}
-				
+
 		io.WriteFile("./" + *sessionName + "/dictionary_" + Ftime.Now().Format("01-02-2006 03_04_05") + ".txt", strings.Join(dictionary, "\n"));
 	} else if (*optimizeEntries) {
 		dictionary = optimization.RemoveDuplicates(dictionary);
 		fmt.Printf("Dictionary: %d entries, %d optimized entries\n", dictionarySize, len(dictionary));
+		io.WriteFile("./" + *sessionName + "/dictionary_" + Ftime.Now().Format("01-02-2006 03_04_05") + ".txt", strings.Join(dictionary, "\n"));
 	} else {
 		fmt.Printf("Dictionary: %d entries", dictionarySize);
 	}
@@ -135,6 +154,7 @@ func main() {
 
 	if (*algorithm == "auto") {
 		*algorithm = detectedAlgorithm;
+		state.Algorithm = *algorithm;
 		fmt.Printf("Auto detected %s as the hashing algorithm\n\n", detectedAlgorithm);
 	} else if (detectedAlgorithm != *algorithm && !*prehash) {
 		fmt.Println("warning: The specified hashing algorithm does not match the detected hashing algorithm. Make sure the supplied algorithm matches the specified algorithm\n");
@@ -144,6 +164,8 @@ func main() {
 		for i := 0; i < len(passwords); i++ {
 			passwords[i] = hashing.Hash(passwords[i], *algorithm);
 		}
+
+		io.WriteFile("./" + *sessionName + "/passwords_" + Ftime.Now().Format("01-02-2006 03_04_05") + ".txt", strings.Join(passwords, "\n"));
 	}
 
 	if (*threads > len(dictionary)) {
@@ -153,23 +175,10 @@ func main() {
 
 	// Start cracking
 
-	// I could prob make a module to do this and handle the flags in one go but it's fine for now
-	state := cracking.CrackState{
-		Passwords: passwords,
-		Dictionary: dictionary,
-		Algorithm: *algorithm,
-		MaxTime: *maxTime,
-		Threads: *threads,
-		CrackingMethod: *crackingMethod,
-		CrackingMode: *crackingMode,
-		LogFound: *logFound,
-		RemoveFound: *removeFound,
-		NPasswords: len(passwords),
-		SessionName: *sessionName,
-		SameLineLogs: *sameLineLogs,
-		BenchmarkTime: *benchmarkTime,
-		FormattedStartTime: Ftime.Now().Format("03:04:05 PM"),
-	};
+	state.Threads = *threads;
+	state.Passwords = passwords;
+	state.NPasswords = len(state.Passwords);
+	state.Dictionary = dictionary;
 
 	benchmarkState := benchmarking.Benchmark(state);
 	state.EstimatedTime = len(state.Passwords) / benchmarkState.Hashed / state.BenchmarkTime;
