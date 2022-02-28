@@ -86,6 +86,13 @@ func main() {
 	}
 
 	terminal.Devices();
+	
+	// Some warnings/errors
+
+	if (*maxTime < 1 || *benchmarkTime < 1) {
+		fmt.Println("Cracking/benchmarking times cannot be less than 1");
+		os.Exit(1);
+	}
 
 	// Causes a paradox if you need to know the hashing algorithm to prehash but also need to detect the algorithm
 	if (*prehash && *algorithm == "auto") {
@@ -171,7 +178,10 @@ func main() {
 	}
 
 	if (*threads > len(dictionary)) {
-		fmt.Println("warning: The number of threads is larger than the number size of the dictionary so it has been normalized\n");
+		fmt.Println("warning: The number of threads is larger than the size of the dictionary so it has been normalized\n");
+		*threads = len(dictionary);
+	} else if (*threads < len(dictionary)) {
+		fmt.Println("warning: The number of threads is smaller than the size of the dictionary so it has been normalized\n");
 		*threads = len(dictionary);
 	}
 
@@ -183,7 +193,7 @@ func main() {
 	state.Dictionary = dictionary;
 
 	benchmarkState := benchmarking.Benchmark(state);
-	state.EstimatedTime = len(state.Passwords) / benchmarkState.Hashed / state.BenchmarkTime;
+	state.EstimatedTime = len(state.Passwords) / math.Max(benchmarkState.Hashed, 1) / state.BenchmarkTime;
 
 	fmt.Printf("Started cracking at %s\n\n", state.FormattedStartTime);
 

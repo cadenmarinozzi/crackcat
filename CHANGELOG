@@ -7,3 +7,4 @@ Fixed speeds not being completely accurate due to them using the max time instea
 
 * 2/27/22 8:49 PM
 Added http support for loading passwords/dictionaries/rules
+Added some checks
