@@ -100,6 +100,11 @@ func main() {
 		os.Exit(1);
 	}
 
+	if (*threads < 1) {
+		fmt.Println("The number of threads cannot be less than 1");
+		os.Exit(1);
+	}
+
 	// This can cause some of the goroutines to be ignored so it's considered dangerous
 	if (*threads > cores) {
 		fmt.Println("warning: The number of threads supplied is greater than the number of cores on the device, this could cause performance issues\n");
@@ -107,6 +112,11 @@ func main() {
 
 	if (*logFound) {
 		fmt.Println("warning: Logging found passwords results in crackcat cracking slower, log_found should not be used for general purposes\n");
+	}
+
+	if (*dictionaryCutoff < 0) {
+		fmt.Println("Dictionary cutoff cannot be negative");
+		ox.Exit(1);
 	}
 
 	terminal.Optimizers(map[string]bool{
@@ -180,9 +190,6 @@ func main() {
 	if (*threads > len(dictionary)) {
 		fmt.Println("warning: The number of threads is larger than the size of the dictionary so it has been normalized\n");
 		*threads = len(dictionary);
-	} else if (*threads < len(dictionary)) {
-		fmt.Println("warning: The number of threads is smaller than the size of the dictionary so it has been normalized\n");
-		*threads = len(dictionary);
 	}
 
 	// Start cracking
@@ -193,7 +200,7 @@ func main() {
 	state.Dictionary = dictionary;
 
 	benchmarkState := benchmarking.Benchmark(state);
-	state.EstimatedTime = len(state.Passwords) / math.Max(benchmarkState.Hashed, 1) / state.BenchmarkTime;
+	state.EstimatedTime = len(state.Passwords) / int(math.Max(float64(benchmarkState.Hashed), 1)) / state.BenchmarkTime;
 
 	fmt.Printf("Started cracking at %s\n\n", state.FormattedStartTime);
 
