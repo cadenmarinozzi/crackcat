@@ -19,6 +19,7 @@ type CrackState struct {
 	MaxTime int;
 	BenchmarkTime int;
 	EstimatedTime int;
+	DeltaTime int;
 
 	CrackingMethod string;
 	CrackingMode string;

@@ -1,3 +1,6 @@
 * 2/24/22 1:44 PM
 Fixed a bug that caused threads to keep running even after they had gone through all of their entries
 Fixed a bug with single threaded cracking that slowed it down substantially
+
+* 2/27/22 *;27 PM
+Fixed speeds not being completely accurate due to them using the max time instead of the delta time

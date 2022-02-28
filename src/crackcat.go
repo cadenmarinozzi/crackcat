@@ -192,6 +192,8 @@ func main() {
 
 		state.EndTime = time.Seconds();
 		state.FormattedEndTime = Ftime.Now().Format("03:04:05 PM");
+
+		state.DeltaTime = state.EndTime - state.StartTime;
 		
 		io.WriteFile("./" + state.SessionName + "/found_" + Ftime.Now().Format("01-02-2006 03_04_05") + ".txt", strings.Join(state.Found, "\n"));
 		terminal.Cracked(state);
