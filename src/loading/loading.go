@@ -7,7 +7,11 @@ package loading
 
 import (
 	"net/http"
-	"io"
+	"main/io"
+	"fmt"
+	"strings"
+	"os"
+	IO "io"
 )
 
 func loadFromHttp(url string) []string {
@@ -18,7 +22,16 @@ func loadFromHttp(url string) []string {
 		os.Exit(1);
 	}
 
-	return strings.Split(response.Body, "\n");
+	defer response.Body.Close();
+
+	body, err := IO.ReadAll(response.Body);
+
+	if (err != nil) {
+		fmt.Println(err);
+		os.Exit(1);
+	}
+
+	return strings.Split(string(body), "\n");
 }
 
 func Load(file string) []string {
