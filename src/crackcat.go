@@ -12,6 +12,7 @@ import (
 	"main/benchmarking"
 	"main/hashing"
 	"main/time"
+	"main/loading"
 	genRules "main/rules"
 	"main/optimization"
 	"flag"
@@ -106,7 +107,7 @@ func main() {
 	});
 	
 	// Load the passwords and dictionary entries from the files
-	dictionary := io.ReadFileLines(*dictionaryFile);
+	dictionary := loading.Load(*dictionaryFile);
 
 	if (*dictionaryCutoff != 0) {
 		dictionary = dictionary[:*dictionaryCutoff];
@@ -114,7 +115,7 @@ func main() {
 
 	dictionarySize := len(dictionary);
 
-	passwords := io.ReadFileLines(*passwordsFile);
+	passwords := loading.Load(*passwordsFile);
 	passwordsSize := len(passwords);
 
 	if (*optimizeEntries) {
@@ -125,7 +126,7 @@ func main() {
 	}
 
 	if (*rulesFile != "") {
-		rules := io.ReadFileLines(*rulesFile);
+		rules := loading.Load(*rulesFile);
 		rulesSize := len(rules);
 
 		if (*optimizeEntries) {
