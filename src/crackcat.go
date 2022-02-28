@@ -116,7 +116,7 @@ func main() {
 
 	if (*dictionaryCutoff < 0) {
 		fmt.Println("Dictionary cutoff cannot be negative");
-		ox.Exit(1);
+		os.Exit(1);
 	}
 
 	terminal.Optimizers(map[string]bool{
