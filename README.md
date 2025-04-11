@@ -39,4 +39,4 @@ See TODO for the TODO list. (lol)
 License information is in LICENSE.
 
 ## Author
-crackcat is made with ❤ by nekumelon.
+crackcat is made with ❤ by cadenmarinozzi.
